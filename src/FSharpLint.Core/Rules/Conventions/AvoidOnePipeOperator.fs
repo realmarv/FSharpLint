@@ -19,15 +19,34 @@ let runner (args: AstNodeRuleParams) =
             | SynExpr.App(exprAtomicFlag, isInfix, funcExpr, argExpr, range) ->
                 match funcExpr with
                 | SynExpr.App(exprAtomicFlag, isInfix, funcExpr, argExpr, range) ->
-                    match argExpr with
-                    | SynExpr.App(exprAtomicFlag, isInfix, funcExpr, argExpr, range) ->
-                        match funcExpr with
-                        | SynExpr.App(exprAtomicFlag, isInfix, funcExpr, argExpr, range) ->
-                            match funcExpr with
-                            | SynExpr.Ident ident ->
-                                if ident.idText = "op_PipeRight" then
-                                    Array.empty
-                                else
+                    match funcExpr with
+                    | SynExpr.Ident ident ->
+                        if ident.idText = "op_PipeRight" then
+                            match argExpr with
+                            | SynExpr.App(exprAtomicFlag, isInfix, funcExpr, argExpr, range) ->
+                                
+                                match funcExpr with
+                                | SynExpr.App(exprAtomicFlag, isInfix, funcExpr, argExpr, range) ->
+                                    match funcExpr with
+                                    | SynExpr.Ident ident ->
+                                        if ident.idText = "op_PipeRight" then
+                                            Array.empty
+                                        else
+                                            {
+                                                Range = range
+                                                Message = String.Format(Resources.GetString ("RulesAvoidOnePipeOperator"))
+                                                SuggestedFix = None
+                                                TypeChecks = List.Empty
+                                            } |> Array.singleton
+                                    | _ ->
+                                        {
+                                            Range = range
+                                            Message = String.Format(Resources.GetString ("RulesAvoidOnePipeOperator"))
+                                            SuggestedFix = None
+                                            TypeChecks = List.Empty
+                                        } |> Array.singleton
+                                        
+                                | _ ->
                                     {
                                         Range = range
                                         Message = String.Format(Resources.GetString ("RulesAvoidOnePipeOperator"))
@@ -41,35 +60,14 @@ let runner (args: AstNodeRuleParams) =
                                     SuggestedFix = None
                                     TypeChecks = List.Empty
                                 } |> Array.singleton
-                                
-                        | _ ->
-                            {
-                                Range = range
-                                Message = String.Format(Resources.GetString ("RulesAvoidOnePipeOperator"))
-                                SuggestedFix = None
-                                TypeChecks = List.Empty
-                            } |> Array.singleton
+                        else
+                            Array.empty
                     | _ ->
-                        {
-                            Range = range
-                            Message = String.Format(Resources.GetString ("RulesAvoidOnePipeOperator"))
-                            SuggestedFix = None
-                            TypeChecks = List.Empty
-                        } |> Array.singleton
+                        Array.empty
                 | _ ->
-                    {
-                        Range = range
-                        Message = String.Format(Resources.GetString ("RulesAvoidOnePipeOperator"))
-                        SuggestedFix = None
-                        TypeChecks = List.Empty
-                    } |> Array.singleton
+                    Array.empty
             | _ ->
-                {
-                    Range = range
-                    Message = String.Format(Resources.GetString ("RulesAvoidOnePipeOperator"))
-                    SuggestedFix = None
-                    TypeChecks = List.Empty
-                } |> Array.singleton
+                Array.empty
         | _ ->
             Array.empty
 
