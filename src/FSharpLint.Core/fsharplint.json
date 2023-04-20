@@ -274,6 +274,7 @@
         }
     },
     "avoidTooShortNames": { "enabled": false },
+    "avoidUsingResultPropertyOfTaskVariable": { "enabled": true },
     "indentation": {
         "enabled": false
     },
