@@ -11,9 +11,7 @@ type TestConventionsAvoidUsingResultPropertyOfTaskVariable() =
     member this.``Avoid using .Result property of a Task<'T> variable in a function``() =
         this.Parse
             """
-open System.Threading.Tasks
-
-let GetTaskOutput (task: Task<string>) =
+let GetTaskOutput (task: System.Threading.Tasks.Task<string>) =
     task.Result"""
 
         Assert.IsTrue this.ErrorsExist
