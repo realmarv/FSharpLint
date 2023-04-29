@@ -10,7 +10,7 @@ open FSharpLint.Framework.Rules
 
 let runner (args: AstNodeRuleParams) =
 
-    let error =
+    let errorsType1 =
         match args.AstNode with
         | Binding (SynBinding (_, _, _, _, _, _, _, headPat, _, expr, range, _)) ->
 
@@ -62,7 +62,33 @@ let runner (args: AstNodeRuleParams) =
             | _ -> Array.empty
         | _ -> Array.empty
 
-    error
+    let errorsType2 =
+        match (args.AstNode, args.CheckInfo) with
+        | (AstNode.Identifier ([ identifierName; identifierProperty ], range), Some checkInfo) ->
+            let partialAssemblySignature = checkInfo.PartialAssemblySignature
+            let entity = partialAssemblySignature.Entities.[0]
+
+            if identifierProperty <> "Result" then
+                Array.empty
+            else
+                entity.MembersFunctionsAndValues
+                |> Seq.map (fun item ->
+
+                    match item.FullType.BaseType with
+                    | Some baseType when
+                        baseType.ToString() = "type System.Threading.Tasks.Task"
+                        && item.DisplayName = identifierName
+                        ->
+                        { Range = range
+                          Message = Resources.GetString "RulesAvoidUsingResultPropertyOfTaskVariableError"
+                          SuggestedFix = None
+                          TypeChecks = List.Empty }
+                        |> Array.singleton
+                    | _ -> Array.empty)
+                |> Array.concat
+        | _ -> Array.empty
+
+    Array.append errorsType1 errorsType2
 
 let rule =
     { Name = "AvoidUsingResultPropertyOfTaskVariable"
